@@ -1,25 +1,24 @@
 package baseball.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 
 /**
  * @date : 2021-10-04
- * @author : chang
+ * @author : 박창혁
  * @description : 컴퓨터 객체 생성
  **/
 public class Computer {
-	private List<Integer> balls;
+	private LinkedHashSet<Integer> balls;
 
 	public Computer() {
-		this.balls = new ArrayList<>();
+		this.balls = new LinkedHashSet<>();
 	}
 
-	public List<Integer> getBalls() {
+	public LinkedHashSet<Integer> getBalls() {
 		return balls;
 	}
 
-	public void setBalls(List<Integer> balls) {
+	public void setBalls(LinkedHashSet<Integer> balls) {
 		this.balls = balls;
 	}
 }
