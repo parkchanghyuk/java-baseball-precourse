@@ -42,10 +42,7 @@ public class UserView {
 	 * @description : 야구 점수
 	 **/
 	public void score(int strike, int ball) {
-		printStrike(strike);
-		printBall(ball);
-		printNothing(strike + ball);
-		System.out.println("");
+		System.out.println(printStrike(strike) + printBall(ball) + printNothing(strike + ball));
 	}
 
 	/**
@@ -53,21 +50,15 @@ public class UserView {
 	 * @author : 박창혁
 	 * @description : 스트라이크 출력
 	 **/
-	public void printStrike(int number) {
-		if (number > 0) {
-			System.out.print(number + MsgEnum.STRIKE.getMsg() + " ");
-		}
+	public String printStrike(int number) {
+		return number > 0 ? number + MsgEnum.STRIKE.getMsg() + " " : null;
 	}
 
-	public void printBall(int number) {
-		if (number > 0) {
-			System.out.print(number + " " + MsgEnum.BALL.getMsg());
-		}
+	public String printBall(int number) {
+		return number > 0 ? number + MsgEnum.BALL.getMsg() : null;
 	}
 
-	public void printNothing(int number) {
-		if (number == 0) {
-			System.out.print(MsgEnum.NOTHING.getMsg());
-		}
+	public String printNothing(int number) {
+		return number == 0 ? MsgEnum.NOTHING.getMsg() : null;
 	}
 }
