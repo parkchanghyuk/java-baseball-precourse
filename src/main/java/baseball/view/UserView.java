@@ -45,6 +45,7 @@ public class UserView {
 		printStrike(strike);
 		printBall(ball);
 		printNothing(strike + ball);
+		System.out.println("");
 	}
 
 	/**
@@ -54,7 +55,7 @@ public class UserView {
 	 **/
 	public void printStrike(int number) {
 		if (number > 0) {
-			System.out.print(number + " " + MsgEnum.STRIKE.getMsg());
+			System.out.print(number + MsgEnum.STRIKE.getMsg() + " ");
 		}
 	}
 
@@ -66,7 +67,7 @@ public class UserView {
 
 	public void printNothing(int number) {
 		if (number == 0) {
-			System.out.print(MsgEnum.BALL.getMsg());
+			System.out.print(MsgEnum.NOTHING.getMsg());
 		}
 	}
 }
