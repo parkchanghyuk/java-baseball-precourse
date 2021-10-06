@@ -47,19 +47,8 @@ public class BaseballGameController {
 		computer = new Computer();
 		LinkedHashSet<Integer> randomList = computer.getBalls();
 		while (randomList.size() < Const.NUMBER_MAX_DIGITS) {
-			addNonDuplicateNumbers(randomList);
+			randomList.add(Randoms.pickNumberInRange(Const.START_NUM, Const.END_NUM));
 		}
-	}
-
-	/**
-	 * @date : 2021-10-05
-	 * @author : 박창혁
-	 * @description : 생성된 랜덤 숫자 중복되지 않을 경우 리스트에 add
-	 **/
-	private void addNonDuplicateNumbers(LinkedHashSet<Integer> randomSet) {
-		//랜덤 숫자 생성
-		int random = Randoms.pickNumberInRange(Const.START_NUM, Const.END_NUM);
-		randomSet.add(random);
 	}
 
 	/**
