@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import baseball.common.Const;
 import baseball.common.ErrMsgEnum;
 import baseball.common.MsgEnum;
+import baseball.exception.UserException;
 import baseball.model.Computer;
 import baseball.view.UserView;
 import nextstep.utils.Randoms;
@@ -31,8 +32,6 @@ public class BaseballGameController {
 	public void baseballGame() {
 		boolean stat;
 		do {
-			//userView.readLine();
-			//userView.comment(MsgEnum.WELCOME.getMsg());
 			// 난수 생성
 			initRandomBalls();
 			// 게임 시작
@@ -47,7 +46,7 @@ public class BaseballGameController {
 	 **/
 	private void initRandomBalls() {
 		Set<Integer> randomSet = new HashSet<>();
-		while (randomSet.size() <= Const.MAX_DIGITS) {
+		while (randomSet.size() < Const.MAX_DIGITS) {
 			addNonDuplicateNumbers(randomSet);
 		}
 		//computer 객체에 set
@@ -66,6 +65,7 @@ public class BaseballGameController {
 		//list에 동일 숫자 포함 확인
 		if (!randomSet.contains(random)) {
 			randomSet.add(random);
+			System.out.println("random == " + random);
 		}
 	}
 
@@ -80,8 +80,7 @@ public class BaseballGameController {
 		do {
 			//사용자 input
 			userInput = userView.readLine(MsgEnum.ING.getMsg());
-			stat = checkGameStart(userInput);
-		} while (stat);
+		} while (checkGameStart(userInput));
 		return false;
 	}
 
@@ -91,14 +90,7 @@ public class BaseballGameController {
 	 * @description : 게임 시작 유효성 체크. true 일 경우 게임진행, false 일 경우 게임 종료
 	 **/
 	private boolean checkGameStart(String input) {
-		// number 사이즈 체크
-		if (checkNumberSize(input)) {
-			userView.comment(ErrMsgEnum.SIZE.getMsg());
-			return true;
-		}
-		// 1~9까지의 숫자 체크
-		if (checkNumberRange(input)) {
-			userView.comment(ErrMsgEnum.RANGE.getMsg());
+		if (validate(input)) {
 			return true;
 		}
 		if (checkScore(input)) {
@@ -110,19 +102,25 @@ public class BaseballGameController {
 	/**
 	 * @date : 2021-10-05
 	 * @author : 박창혁
+	 * @description : 유효성 체크
+	 **/
+	private boolean validate(String input) {
+		try {
+			validateNumberSize(input);
+			validateNumberRange(input);
+		} catch (Exception e) {
+			userView.comment(e.getMessage());
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @date : 2021-10-05
+	 * @author : 박창혁
 	 * @description : 게임 종료 유효성 체크
 	 **/
 	private boolean checkGameReStart(String input) {
-		// number 사이즈 체크
-		if (checkNumberSize(input)) {
-			userView.readLine(ErrMsgEnum.SIZE.getMsg());
-			return true;
-		}
-		// 1~9까지의 숫자 체크
-		if (checkNumberRange(input)) {
-			userView.readLine(ErrMsgEnum.RANGE.getMsg());
-			return true;
-		}
 		return false;
 	}
 
@@ -131,14 +129,11 @@ public class BaseballGameController {
 	 * @author : 박창혁
 	 * @description : 범위 체크
 	 **/
-	private boolean checkNumberRange(String balls) {
-		String pattern = "[" + Const.START_NUM + "-" + Const.END_NUM + "]";
-		boolean valid = true;
-		int idx = 0;
-		do {
-			valid = Pattern.matches(pattern, balls.substring(idx, idx));
-		} while (valid && ++idx < Const.MAX_DIGITS);
-		return valid;
+	private void validateNumberRange(String balls) throws UserException {
+		String pattern = "^[" + Const.START_NUM + "-" + Const.END_NUM + "]{" + Const.MAX_DIGITS + "}$";
+		if (!Pattern.matches(pattern, balls)) {
+			throw new UserException(ErrMsgEnum.RANGE.getMsg());
+		}
 	}
 
 	/**
@@ -146,14 +141,16 @@ public class BaseballGameController {
 	 * @author : 박창혁
 	 * @description : number 사이즈 체크
 	 **/
-	private boolean checkNumberSize(String balls) {
-		return balls.length() != Const.MAX_DIGITS;
+	private void validateNumberSize(String balls) throws UserException {
+		if (balls.length() != Const.MAX_DIGITS) {
+			throw new UserException(ErrMsgEnum.SIZE.getMsg());
+		}
 	}
 
 	/**
 	 * @date : 2021-10-06
 	 * @author : 박창혁
-	 * @description : 점수 체크 
+	 * @description : 점수 체크
 	 **/
 	private boolean checkScore(String input) {
 		int strike = getStrick(input);
@@ -165,7 +162,7 @@ public class BaseballGameController {
 	/**
 	 * @date : 2021-10-06
 	 * @author : 박창혁
-	 * @description :  스트라이크 체크 
+	 * @description :  스트라이크 체크
 	 **/
 	private int getStrick(String input) {
 		Iterator<Integer> iter = computer.getBalls().iterator();
@@ -173,6 +170,7 @@ public class BaseballGameController {
 		int idx = 0;
 		while (iter.hasNext()) {
 			count += numberEquals(iter.next(), Integer.parseInt(input.substring(idx, idx + 1)));
+			idx++;
 		}
 		return count;
 	}
