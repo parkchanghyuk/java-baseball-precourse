@@ -1,6 +1,7 @@
 package baseball.model;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @date : 2021-10-04
@@ -8,16 +9,17 @@ import java.util.Set;
  * @description : 컴퓨터 객체 생성
  **/
 public class Computer {
-	private Set<Integer> balls;
+	private List<Integer> balls;
 
 	public Computer() {
+		this.balls = new ArrayList<>();
 	}
 
-	public Set<Integer> getBalls() {
+	public List<Integer> getBalls() {
 		return balls;
 	}
 
-	public void setBalls(Set<Integer> balls) {
+	public void setBalls(List<Integer> balls) {
 		this.balls = balls;
 	}
 }

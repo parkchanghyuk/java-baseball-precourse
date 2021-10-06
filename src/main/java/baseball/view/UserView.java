@@ -30,7 +30,7 @@ public class UserView {
 
 	public String readLine(String msg) {
 		if (!msg.isEmpty()) {
-			System.out.print(msg);
+			System.out.println(msg);
 		}
 		return Console.readLine();
 	}
