@@ -7,6 +7,7 @@ package baseball.common;
  **/
 public enum ErrMsgEnum {
 	SIZE("3자리의 숫자만 입력 가능합니다."),
+	CODE_SIZE("1자리의 숫자만 입력 가능합니다."),
 	RANGE(Const.START_NUM + "~" + Const.END_NUM + "까지의 숫자만 입력 가능합니다."),
 	NON_DUPLICATE_NUMBERS("숫자가 중복되었습니다.");
 
