@@ -1,11 +1,15 @@
 package baseball.controller;
 
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
+import baseball.common.BaseballUtil;
 import baseball.common.Const;
 import baseball.common.ErrMsgEnum;
+import baseball.common.GameStatEnum;
 import baseball.common.MsgEnum;
 import baseball.exception.UserException;
 import baseball.model.Computer;
@@ -23,15 +27,15 @@ public class BaseballGameController {
 	private Computer computer;
 
 	/**
-	 * @packageName : baseball.controller
 	 * @date : 2021-10-05
 	 * @author : 박창혁
 	 * @description : 야구 게임
 	 **/
 	public void baseballGame() {
 		do {
+			userView.comment(MsgEnum.WELCOME.getMsg()); // 시작
 			initRandomBalls(); // 난수 생성
-		} while (gameStart()); // 게임 시작
+		} while (GameStatEnum.GAME_START == gameStart()); // 게임 시작
 	}
 
 	/**
@@ -41,8 +45,8 @@ public class BaseballGameController {
 	 **/
 	private void initRandomBalls() {
 		computer = new Computer();
-		List<Integer> randomList = computer.getBalls();
-		while (randomList.size() < Const.MAX_DIGITS) {
+		LinkedHashSet<Integer> randomList = computer.getBalls();
+		while (randomList.size() < Const.NUMBER_MAX_DIGITS) {
 			addNonDuplicateNumbers(randomList);
 		}
 	}
@@ -52,13 +56,10 @@ public class BaseballGameController {
 	 * @author : 박창혁
 	 * @description : 생성된 랜덤 숫자 중복되지 않을 경우 리스트에 add
 	 **/
-	private void addNonDuplicateNumbers(List<Integer> randomSet) {
+	private void addNonDuplicateNumbers(LinkedHashSet<Integer> randomSet) {
 		//랜덤 숫자 생성
 		int random = Randoms.pickNumberInRange(Const.START_NUM, Const.END_NUM);
-		//list에 동일 숫자 포함 확인
-		if (!randomSet.contains(random)) {
-			randomSet.add(random);
-		}
+		randomSet.add(random);
 	}
 
 	/**
@@ -66,27 +67,25 @@ public class BaseballGameController {
 	 * @author : 박창혁
 	 * @description : 게임 시작
 	 **/
-	private boolean gameStart() {
+	private GameStatEnum gameStart() {
+		userView.comment(MsgEnum.INFO.getMsg());
 		String userInput;
 		do {
-			userInput = userView.readLine(MsgEnum.ING.getMsg());
-		} while (checkGameStart(userInput));
+			userInput = userView.readLine(MsgEnum.INPUT.getMsg());
+		} while (GameStatEnum.IN_GAME == gameProcess(userInput));
 		return gameReStart();
 	}
 
 	/**
 	 * @date : 2021-10-05
 	 * @author : 박창혁
-	 * @description : 게임 시작 유효성 체크. true 일 경우 게임진행, false 일 경우 게임 종료
+	 * @description : 게임 유효성 체크, 점수 체크. 3 스트라이크일 경우에만
 	 **/
-	private boolean checkGameStart(String input) {
-		if (validateGame(input)) {
-			return true;
+	private GameStatEnum gameProcess(String input) {
+		if (validateInGame(input) || checkScore(input)) {
+			return GameStatEnum.IN_GAME;
 		}
-		if (checkScore(input)) {
-			return true;
-		}
-		return false;
+		return GameStatEnum.GAME_OVER;
 	}
 
 	/**
@@ -94,15 +93,33 @@ public class BaseballGameController {
 	 * @author : 박창혁
 	 * @description : 유효성 체크
 	 **/
-	private boolean validateGame(String input) {
+	private boolean validateInGame(String input) {
 		try {
 			validateNumberSize(input);
 			validateNumberRange(input);
+			validateDupNumber(input);
+
 		} catch (Exception e) {
 			userView.comment(e.getMessage());
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * @date : 2021-10-06
+	 * @author : 박창혁
+	 * @description : 숫자 중복 체크. Set으로 중복 제거 후 크기 비교
+	 **/
+	private void validateDupNumber(String input) throws Exception {
+		Set<Integer> duplicate = new HashSet<>();
+		for (char number : input.toCharArray()) {
+			duplicate.add(Character.getNumericValue(number));
+		}
+
+		if (duplicate.size() != Const.NUMBER_MAX_DIGITS) {
+			throw new UserException(ErrMsgEnum.NON_DUPLICATE_NUMBERS.getMsg());
+		}
 	}
 
 	/**
@@ -112,7 +129,7 @@ public class BaseballGameController {
 	 **/
 	private boolean validateGameReStart(String input) {
 		try {
-			validateRestart(input);
+			validateGameCode(input);
 		} catch (Exception e) {
 			userView.comment(e.getMessage());
 			return true;
@@ -120,12 +137,17 @@ public class BaseballGameController {
 		return false;
 	}
 
-	private void validateRestart(String input) throws Exception {
-		if (input.length() != 1) {
-			throw new UserException(ErrMsgEnum.SIZE.getMsg());
+	/**
+	 * @date : 2021-10-06
+	 * @author : 박창혁
+	 * @description : 게임 코드 유효성 (사이즈, 존재여부)
+	 **/
+	private void validateGameCode(String input) throws UserException {
+		if (input.length() != Const.CODE_MAX_DIGITS) {
+			throw new UserException(ErrMsgEnum.CODE_SIZE.getMsg());
 		}
 
-		if (!"1".equals(input) && !"2".equals(input)) {
+		if (!GameStatEnum.GAME_START.getCode().equals(input) && !GameStatEnum.GAME_OVER.getCode().equals(input)) {
 			throw new UserException(ErrMsgEnum.RANGE.getMsg());
 		}
 	}
@@ -135,12 +157,13 @@ public class BaseballGameController {
 	 * @author : 박창혁
 	 * @description : 게임 종료 유효성 체크
 	 **/
-	private boolean gameReStart() {
+	private GameStatEnum gameReStart() {
 		String userInput;
+		userView.comment(MsgEnum.GAME_OVER.getMsg());
 		do {
-			userInput = userView.readLine(MsgEnum.GAME_OVER.getMsg());
+			userInput = userView.readLine(MsgEnum.INPUT.getMsg());
 		} while (validateGameReStart(userInput));
-		return userInput.equals("1");
+		return GameStatEnum.GAME_START.getCode().equals(userInput) ? GameStatEnum.GAME_START : GameStatEnum.GAME_OVER;
 	}
 
 	/**
@@ -149,7 +172,7 @@ public class BaseballGameController {
 	 * @description : 범위 체크
 	 **/
 	private void validateNumberRange(String balls) throws UserException {
-		String pattern = "^[" + Const.START_NUM + "-" + Const.END_NUM + "]{" + Const.MAX_DIGITS + "}$";
+		String pattern = "^[" + Const.START_NUM + "-" + Const.END_NUM + "]{" + Const.NUMBER_MAX_DIGITS + "}$";
 		if (!Pattern.matches(pattern, balls)) {
 			throw new UserException(ErrMsgEnum.RANGE.getMsg());
 		}
@@ -161,7 +184,7 @@ public class BaseballGameController {
 	 * @description : number 사이즈 체크
 	 **/
 	private void validateNumberSize(String balls) throws UserException {
-		if (balls.length() != Const.MAX_DIGITS) {
+		if (balls.length() != Const.NUMBER_MAX_DIGITS) {
 			throw new UserException(ErrMsgEnum.SIZE.getMsg());
 		}
 	}
@@ -175,7 +198,7 @@ public class BaseballGameController {
 		int strike = getNumberOfStrikes(input);
 		int ball = getNumberOfContains(input) - strike;
 		userView.printScore(strike, ball);
-		return strike != Const.MAX_DIGITS;
+		return strike != Const.NUMBER_MAX_DIGITS;
 	}
 
 	/**
@@ -188,8 +211,7 @@ public class BaseballGameController {
 		int count = 0;
 		int idx = 0;
 		while (iter.hasNext()) {
-			count += numberEquals(iter.next(), Integer.parseInt(input.substring(idx, idx + 1)));
-			idx++;
+			count += BaseballUtil.numberComparison(iter.next(), Integer.parseInt(input.substring(idx, (idx++) + 1)));
 		}
 		return count;
 	}
@@ -197,31 +219,14 @@ public class BaseballGameController {
 	/**
 	 * @date : 2021-10-06
 	 * @author : 박창혁
-	 * @description : 숫자 비교. 성공 시 1, 실패 시 2 반환
-	 **/
-	private int numberEquals(int standard, int target) {
-		return standard == target ? 1 : 0;
-	}
-
-	/**
-	 * @date : 2021-10-06
-	 * @author : 박창혁
-	 * @description :
+	 * @description : 숫자 포함 개수 체크
 	 **/
 	private int getNumberOfContains(String input) {
 		int count = 0;
 		for (char target : input.toCharArray()) {
-			count += numberContains(computer.getBalls(), Character.getNumericValue(target));
+			count += BaseballUtil.numberContains(computer.getBalls(), Character.getNumericValue(target));
 		}
 		return count;
 	}
 
-	/**
-	 * @date : 2021-10-06
-	 * @author : 박창혁
-	 * @description : 숫자 비교. 성공 시 1, 실패 시 2 반환
-	 **/
-	private int numberContains(List<Integer> standard, int target) {
-		return standard.contains(target) ? 1 : 0;
-	}
 }
