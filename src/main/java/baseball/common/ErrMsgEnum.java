@@ -13,7 +13,7 @@ public enum ErrMsgEnum {
 	String msg;
 
 	ErrMsgEnum(String msg) {
-		this.msg = msg;
+		this.msg = "[ERROR]" + msg;
 	}
 
 	public String getMsg() {
