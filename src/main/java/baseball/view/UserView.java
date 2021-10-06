@@ -13,7 +13,7 @@ public class UserView {
 	/**
 	 * @date : 2021-10-05
 	 * @author : 박창혁
-	 * @description : 공지
+	 * @description : println
 	 **/
 	public void comment(String msg) {
 		System.out.println(msg);
@@ -30,7 +30,7 @@ public class UserView {
 
 	public String readLine(String msg) {
 		if (!msg.isEmpty()) {
-			System.out.println(msg);
+			System.out.print(msg);
 		}
 		return Console.readLine();
 	}

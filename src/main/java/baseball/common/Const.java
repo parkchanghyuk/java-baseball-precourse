@@ -6,7 +6,8 @@ package baseball.common;
  * @description : 공통 변수
  **/
 public class Const {
-	public static final int MAX_DIGITS = 3; //자릿수
+	public static final int NUMBER_MAX_DIGITS = 3; //자릿수
+	public static final int CODE_MAX_DIGITS = 1; //코드자릿수
 	public static final int START_NUM = 1; //시작 숫자
 	public static final int END_NUM = 9; //종료 숫자
 }
