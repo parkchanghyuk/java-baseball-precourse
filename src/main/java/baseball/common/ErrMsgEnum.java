@@ -1,4 +1,4 @@
-﻿package baseball.common;
+package baseball.common;
 
 /**
  * @date : 2021-10-04

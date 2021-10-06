@@ -1,4 +1,4 @@
-﻿package baseball.model;
+package baseball.model;
 
 import java.util.Set;
 
@@ -10,7 +10,7 @@ import java.util.Set;
 public class Computer {
 	private Set<Integer> balls;
 
-	Computer() {
+	public Computer() {
 	}
 
 	public Set<Integer> getBalls() {
