@@ -4,10 +4,9 @@ import baseball.common.MsgEnum;
 import nextstep.utils.Console;
 
 /**
- * @packageName : baseball.view
  * @date : 2021-10-04
  * @author : 박창혁
- * @description :
+ * @description : view
  **/
 
 public class UserView {
@@ -41,24 +40,34 @@ public class UserView {
 	 * @author : 박창혁
 	 * @description : 야구 점수
 	 **/
-	public void score(int strike, int ball) {
-		System.out.println(printStrike(strike) + printBall(ball) + printNothing(strike + ball));
+	public void printScore(int strike, int ball) {
+		this.comment(toStringStrike(strike) + toStringBall(ball) + toStringNothing(strike + ball));
 	}
 
 	/**
 	 * @date : 2021-10-06
 	 * @author : 박창혁
-	 * @description : 스트라이크 출력
+	 * @description : 스트라이크 문자 반환
 	 **/
-	public String printStrike(int number) {
-		return number > 0 ? number + MsgEnum.STRIKE.getMsg() + " " : null;
+	private String toStringStrike(int number) {
+		return number > 0 ? number + MsgEnum.STRIKE.getMsg() + " " : "";
 	}
 
-	public String printBall(int number) {
-		return number > 0 ? number + MsgEnum.BALL.getMsg() : null;
+	/**
+	 * @date : 2021-10-06
+	 * @author : 박창혁
+	 * @description : 스트라이크 문자 반환
+	 **/
+	private String toStringBall(int number) {
+		return number > 0 ? number + MsgEnum.BALL.getMsg() : "";
 	}
 
-	public String printNothing(int number) {
-		return number == 0 ? MsgEnum.NOTHING.getMsg() : null;
+	/**
+	 * @date : 2021-10-06
+	 * @author : 박창혁
+	 * @description : 스트라이크 문자 반환
+	 **/
+	private String toStringNothing(int number) {
+		return number == 0 ? MsgEnum.NOTHING.getMsg() : "";
 	}
 }

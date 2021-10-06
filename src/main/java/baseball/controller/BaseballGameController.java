@@ -155,7 +155,7 @@ public class BaseballGameController {
 	private boolean checkScore(String input) {
 		int strike = getStrick(input);
 		int ball = getContains(input) - strike;
-		userView.score(strike, ball);
+		userView.printScore(strike, ball);
 		return strike != Const.MAX_DIGITS;
 	}
 
