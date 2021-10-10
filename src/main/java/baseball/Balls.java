@@ -1,18 +1,16 @@
 package baseball;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 
 public class Balls {
-	private final LinkedHashSet<Ball> balls;
+	private final LinkedHashSet<Ball> answers;
 
 	public Balls(List<Integer> answers) {
 		LinkedHashSet<Ball> balls = mapBalls(answers);
 		validation(answers, balls);
-		this.balls = balls;
+		this.answers = balls;
 	}
 
 	private LinkedHashSet<Ball> mapBalls(List<Integer> answers) {
@@ -34,10 +32,23 @@ public class Balls {
 
 	public BallStatus play(Ball ball) {
 		BallStatus status;
-		Iterator<Ball> iterator = balls.iterator();
+		Iterator<Ball> iterator = this.answers.iterator();
 		do {
 			status = iterator.next().play(ball);
 		}while(status.isNothing() && iterator.hasNext());
 		return status;
+	}
+
+	public PlayResult play(List<Integer> balls) {
+		Balls userBalls = new Balls(balls);
+		PlayResult result = new PlayResult();
+		Iterator<Ball> iterator = this.answers.iterator();
+
+		do {
+			BallStatus status = userBalls.play(iterator.next());
+			result.report(status);
+		}while(iterator.hasNext());
+
+		return result;
 	}
 }

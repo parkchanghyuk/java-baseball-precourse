@@ -16,6 +16,34 @@ public class BallsTest {
 	}
 
 	@Test
+	void play_3strike(){
+		PlayResult result = com.play(Arrays.asList(1,2,3));
+		assertThat(result.getStrike()).isEqualTo(3);
+		assertThat(result.getBall()).isEqualTo(0);
+	}
+
+	@Test
+	void play_3ball(){
+		PlayResult result = com.play(Arrays.asList(3,1,2));
+		assertThat(result.getStrike()).isEqualTo(0);
+		assertThat(result.getBall()).isEqualTo(3);
+	}
+
+	@Test
+	void play_1strike_1ball(){
+		PlayResult result = com.play(Arrays.asList(1,3,6));
+		assertThat(result.getStrike()).isEqualTo(1);
+		assertThat(result.getBall()).isEqualTo(1);
+	}
+
+	@Test
+	void play_1strike_2ball(){
+		PlayResult result = com.play(Arrays.asList(1,3,2));
+		assertThat(result.getStrike()).isEqualTo(1);
+		assertThat(result.getBall()).isEqualTo(2);
+	}
+
+	@Test
 	void ball(){
 		BallStatus status = com.play(new Ball(1,2));
 		assertThat(status).isEqualTo(BallStatus.BALL);
